@@ -5,6 +5,7 @@ import React, {useEffect, useState, useCallback} from "react";
 import { BigNumber } from "ethers";
 import { FrakCard, NFTItemType } from "../types";
 import NFTItemManager from "../components/nft-item-manager";
+import NFTItemImport from "../components/nft-item-import";
 import NextLink from "next/link";
 import styles from "../styles/my-nfts.module.css";
 import FrakButton from "../components/button";
@@ -94,6 +95,43 @@ export default function MyNFTsView() {
             <NextLink href={`/mint-nft`}>
               <FrakButton style={{ width: "240px", marginTop: "24px" }}>
               Mint NFT
+              </FrakButton>
+            </NextLink>
+          </div>
+        </div>
+      )}
+      {fraktionItems?.length ? (
+        <div style={{ marginTop: "16px" }}>
+          <Grid
+            mt='40px !important'
+            ml='0'
+            mr='0'
+            mb='5.6rem !important'
+            w='100%'
+            templateColumns='repeat(3, 1fr)'
+            gap='3.2rem'
+          >
+            {fraktionItems && fraktionItems.map(item => (
+              <div key={item.marketId}>
+                <NFTItemImport item={item} />
+              </div>
+            ))}
+          </Grid>
+        </div>
+      ) : (
+        <div style={{ marginTop: "8px" }}>
+          <div className={styles.descText}>
+            Head over to the marketplace and invest to get some Fraktions!
+            <br /> If you have already invested, contributions do not appear
+            until the auctions are over.
+          </div>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <NextLink href={"/"}>
+              <FrakButton
+                isOutlined
+                style={{ width: "240px", marginTop: "24px" }}
+              >
+                Back to Marketplace
               </FrakButton>
             </NextLink>
           </div>
