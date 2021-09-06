@@ -26,26 +26,20 @@ export default function MyNFTsView() {
   };
   useEffect(async()=>{
     if(account) {
-      assetsInWallet(account);
-      // Array<Objects>
-      //[attr: address=contract, token_metadata=ipfs url for the meta (name, description, image)]
-
-      // find the addresses that are not in the subgraph (are not fraktions) to import them.
-      // find the NFTs (fraktals) in the subgraph
-      // filter non fraktals
-      let nftOwned = await getSubgraphData('owned',account.toLocaleLowerCase());
-
-      if(nftOwned && nftOwned.fraktalNfts.length > 0){
-        console.log('nftOwned',nftOwned)
-        let nftOwnedObjects = await Promise.all(nftOwned.fraktalNfts.map(x=>{return createObject(x)}))
-        if(nftOwnedObjects){
-          setNftItems(nftOwnedObjects)
-        }else{
-          setNftItems([])
+      const data = await assetsInWallet(account);
+      const assets = data['assets'];
+      console.log(assets);
+      if(assets && assets.length > 0) {
+        let nfts = [];
+        for(const key in assets) {
+          let asset = assets[key];
+          if(asset.asset_contract.schema_name === "ERC721" || asset.token_id === "0") {
+            nfts.push(asset)
+          }
         }
+        setNftItems(nfts)
       }
       let fobjects = await getAccountFraktions()
-      // console.log('fobjects',fobjects)
       if(fobjects && fobjects.fraktionsBalances.length){
         let userBalance = fobjects.fraktionsBalances[0].owner.balance // only one!
         setTotalBalance(parseFloat(userBalance)/10**18)
@@ -69,38 +63,6 @@ export default function MyNFTsView() {
         My NFTs
       </div>
       {nftItems?.length ? (
-        <Grid
-          mt='40px !important'
-          ml='0'
-          mr='0'
-          mb='5.6rem !important'
-          w='100%'
-          templateColumns='repeat(3, 1fr)'
-          gap='3.2rem'
-        >
-          {nftItems.map(item => (
-            <div key={item.marketId}>
-            <NextLink href={`/nft/${item.marketId}/list-item`}>
-              <NFTItemManager item={item} CTAText={"List on Market"} />
-            </NextLink>
-            </div>
-          ))}
-        </Grid>
-      ) : (
-        <div style={{ marginTop: "8px" }}>
-          <div className={styles.descText}>
-            Transfer NFT to your wallet or Mint a new NFT.
-          </div>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <NextLink href={`/mint-nft`}>
-              <FrakButton style={{ width: "240px", marginTop: "24px" }}>
-              Mint NFT
-              </FrakButton>
-            </NextLink>
-          </div>
-        </div>
-      )}
-      {fraktionItems?.length ? (
         <div style={{ marginTop: "16px" }}>
           <Grid
             mt='40px !important'
@@ -111,8 +73,8 @@ export default function MyNFTsView() {
             templateColumns='repeat(3, 1fr)'
             gap='3.2rem'
           >
-            {fraktionItems && fraktionItems.map(item => (
-              <div key={item.marketId}>
+            {nftItems && nftItems.map(item => (
+              <div key={item.id}>
                 <NFTItemImport item={item} />
               </div>
             ))}
@@ -121,17 +83,12 @@ export default function MyNFTsView() {
       ) : (
         <div style={{ marginTop: "8px" }}>
           <div className={styles.descText}>
-            Head over to the marketplace and invest to get some Fraktions!
-            <br /> If you have already invested, contributions do not appear
-            until the auctions are over.
+            Transfer NFT to your wallet or Mint a new NFT.
           </div>
           <div style={{ display: "flex", justifyContent: "center" }}>
-            <NextLink href={"/"}>
-              <FrakButton
-                isOutlined
-                style={{ width: "240px", marginTop: "24px" }}
-              >
-                Back to Marketplace
+            <NextLink href={`/mint-nft`}>
+              <FrakButton style={{ width: "240px", marginTop: "24px" }}>
+              Mint NFT
               </FrakButton>
             </NextLink>
           </div>

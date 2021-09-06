@@ -26,7 +26,7 @@ const NFTItemImport = forwardRef<HTMLDivElement, NFTItemProps>(
         ref={ref}
       >
         <Box minH='30rem' w='100%' position='relative' >
-          <Image src={item.imageURL} width='100%' height='100%' style={{verticalAlign:'auto'}}/>
+          <Image src={item.image_url} width='100%' height='100%' style={{verticalAlign:'auto'}}/>
           {item.countdown && (
             <VStack
               spacing='0'
@@ -63,11 +63,19 @@ const NFTItemImport = forwardRef<HTMLDivElement, NFTItemProps>(
           <Text className='medium-16' mb='1.6rem'>
             {item.name}
           </Text>
-          <NextLink href={`/nft/${item.marketId}/list-item`}>
-            <FrakButton className='semi-16' py='.8rem' px='5.6rem'>
-            Import
-            </FrakButton>
-          </NextLink>
+          {item.asset_contract.schema_name === "ERC721" ? (
+            <NextLink>
+              <FrakButton className='semi-16' py='.8rem' px='5.6rem'>
+                Fractionalize
+              </FrakButton>
+            </NextLink>
+          ) : (
+            <NextLink href={`/nft/${item.id}/list-item`}>
+              <FrakButton className='semi-16' py='.8rem' px='5.6rem'>
+                Import
+              </FrakButton>
+            </NextLink>
+          )}
         </Center>
       </VStack>
     );
